@@ -22,7 +22,11 @@
                         You should avoid {{item.appRestaurantName}}
                         <ul>
                             <li v-for="people in item.people">
-                                {{people.name}} can't eat there
+                                {{ people.name }}
+                                {{ people.cant_drink ? 'cant drink' : ''}}
+                                {{ people.cant_eat&&!people.cant_drink ? 'cant eat' : ''}}
+                                {{ people.cant_eat&&people.cant_drink ? ' or eat' : ''}}
+                                at {{ people.restaurant }}
                             </li>
                         </ul>
                     </li>

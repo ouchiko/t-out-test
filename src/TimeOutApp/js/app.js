@@ -1,3 +1,5 @@
+require("!style-loader!css-loader!../css/app.css");
+
 import Venues from './data/venues.json';
 import People from './data/people.json';
 import VenueProcess from './VenueProcess';

@@ -61,10 +61,12 @@ class VenueProcess
                     }
                 //}
 
-                // Dont bothe rchecking if we can't eat there.
-                if (caneat) {
+                // We can futher improve performance by not testing
+                // if the user is already not allowed via eating. For More
+                // data we would inlcude it.
+                //if (caneat) {
                     candrink = venue.drinks.some(v => person.drinks.includes(v));
-                }
+                //}
 
                 /* Avoid or not? */
                 if (!caneat||!candrink) {
@@ -72,10 +74,13 @@ class VenueProcess
                     notPossible[venue.name] = 1;
                     results.addAvoidVenue({
                         name: person.name,
-                        restaurant: venue.name
+                        restaurant: venue.name,
+                        cant_eat: !caneat,
+                        cant_drink: !candrink
                     });
                 }
             }
+
             // Good venue!
             if (venuestatus) {
                 results.addAcceptableVenue({

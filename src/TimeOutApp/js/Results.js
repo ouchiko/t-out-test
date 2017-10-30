@@ -34,10 +34,10 @@ class Results
         if (!this.avoid[reason.restaurant]) {
             this.avoid[reason.restaurant] = {
                 "appRestaurantName": reason.restaurant,
-                "people": {}
+                "people": []
             };
         }
-        this.avoid[reason.restaurant]['people'][reason.name] = reason;
+        this.avoid[reason.restaurant]['people'].push(reason);
     }
 
     /**
