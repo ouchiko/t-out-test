@@ -187,15 +187,23 @@ var VenueProcess = function () {
         this._people = People;
     }
 
-    /**
-     * Filter the data into those venue we can and cannot goto
-     *
-     */
-
-
     _createClass(VenueProcess, [{
+        key: 'caseFix',
+        value: function caseFix(items) {
+            return items.map(function (v) {
+                return v.toLowerCase();
+            });
+        }
+
+        /**
+         * Filter the data into those venue we can and cannot goto
+         */
+
+    }, {
         key: 'doFiltering',
         value: function doFiltering() {
+            var _this = this;
+
             // Result Object.
             var results = new _Results2.default();
 
@@ -203,39 +211,51 @@ var VenueProcess = function () {
             for (var i = 0; i < this._venues.length; i++) {
                 var venue = this._venues[i];
                 var venuestatus = true;
+
+                venue.drinks = this.caseFix(venue.drinks);
+                venue.food = this.caseFix(venue.food);
+
                 // Process People.
-                for (var k = 0; k < this._people.length; k++) {
-                    var person = this._people[k];
-                    // What wont they eat!
-                    for (var j = 0; j < person.wont_eat.length; j++) {
-                        if (venue.food.includes(person.wont_eat[j])) {
-                            venuestatus = false;
-                            results.addAvoidVenue({
-                                name: person.name,
-                                class: 'food',
-                                reason: person.wont_eat[j],
-                                restaurant: venue.name
-                            });
-                            // We could break here, we can keep compiling a list
-                            // of null people or break out?
-                            break;
+
+                var _loop = function _loop(k) {
+                    var caneat = false;
+                    var candrink = false;
+                    var person = _this._people[k];
+
+                    person.drinks = _this.caseFix(person.drinks);
+                    person.wont_eat = _this.caseFix(person.wont_eat);
+
+                    // More food at the venue than they wont eat, sorted
+                    if (venue.food.length > person.wont_eat.length || venue.food.length == 0) {
+                        caneat = true;
+                    } else if (venue.food) {
+                        /* Only now where venue has same option count as person dislike count */
+                        for (var _i = 0; _i < venue.food.length; _i++) {
+                            if (!person.wont_eat.includes(venue.food[_i])) {
+                                caneat = true;
+                            }
                         }
                     }
-                    // What will they drink.
-                    var drinkstatus = false;
-                    for (var _j = 0; _j < person.drinks.length; _j++) {
-                        if (venue.drinks.includes(person.drinks[_j])) {
-                            drinkstatus = true;
-                        }
-                    }
-                    if (!drinkstatus) {
+
+                    /* If some venue drinks are in person drinks, well ok */
+                    candrink = venue.drinks.some(function (v) {
+                        return person.drinks.includes(v);
+                    });
+
+                    /* Avoid or not? */
+                    if (!caneat || !candrink) {
+                        venuestatus = false;
                         results.addAvoidVenue({
                             name: person.name,
-                            class: 'drink',
-                            reason: 'generic',
+                            class: 'food',
+                            reason: person.wont_eat,
                             restaurant: venue.name
                         });
                     }
+                };
+
+                for (var k = 0; k < this._people.length; k++) {
+                    _loop(k);
                 }
                 // Good venue!
                 if (venuestatus) {

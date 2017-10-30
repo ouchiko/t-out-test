@@ -14,9 +14,14 @@ class VenueProcess
         this._people = People;
     }
 
+    caseFix(items) {
+        return items.map(function(v) {
+            return v.toLowerCase();
+        });
+    }
+
     /**
      * Filter the data into those venue we can and cannot goto
-     *
      */
     doFiltering()
     {
@@ -27,36 +32,41 @@ class VenueProcess
         for (let i=0; i<this._venues.length; i++) {
             let venue = this._venues[i];
             let venuestatus = true;
+
+            venue.drinks = this.caseFix(venue.drinks);
+            venue.food = this.caseFix(venue.food);
+
             // Process People.
             for (let k=0; k<this._people.length; k++) {
+                let caneat = false;
+                let candrink = false;
                 let person = this._people[k];
-                // What wont they eat!
-                for (let j=0;j<person.wont_eat.length;j++) {
-                    if (venue.food.includes(person.wont_eat[j])) {
-                        venuestatus = false;
-                        results.addAvoidVenue({
-                            name: person.name,
-                            class: 'food',
-                            reason: person.wont_eat[j],
-                            restaurant: venue.name
-                        });
-                        // We could break here, we can keep compiling a list
-                        // of null people or break out?
-                        break;
+
+                person.drinks = this.caseFix(person.drinks);
+                person.wont_eat = this.caseFix(person.wont_eat);
+
+                // More food at the venue than they wont eat, sorted
+                if (venue.food.length>person.wont_eat.length || venue.food.length == 0) {
+                    caneat = true;
+                } else if (venue.food){
+                    /* Only now where venue has same option count as person dislike count */
+                    for (let i=0;i<venue.food.length;i++) {
+                        if (!person.wont_eat.includes(venue.food[i])) {
+                            caneat = true;
+                        }
                     }
                 }
-                // What will they drink.
-                let drinkstatus = false;
-                for (let j=0;j<person.drinks.length;j++) {
-                    if (venue.drinks.includes(person.drinks[j])) {
-                        drinkstatus = true;
-                    }
-                }
-                if (!drinkstatus) {
+
+                /* If some venue drinks are in person drinks, well ok */
+                candrink = venue.drinks.some(v => person.drinks.includes(v));
+
+                /* Avoid or not? */
+                if (!caneat||!candrink) {
+                    venuestatus = false;
                     results.addAvoidVenue({
                         name: person.name,
-                        class: 'drink',
-                        reason: 'generic',
+                        class: 'food',
+                        reason: person.wont_eat,
                         restaurant: venue.name
                     });
                 }
