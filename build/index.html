@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test</title>
+        <script src="app@bundle.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <h1 id="title">There are {{count}} restaurants available</h1>
+            <div class="cango">
+                <ul>
+                    <li v-for="item in cango">
+                        You can visit {{item.venue.name}}
+                    </li>
+                </ul>
+            </div>
+            <div class="avoid">
+                You avoid
+                <ul>
+                    <li v-for="item in avoid">
+                        You should avoid {{item.appRestaurantName}}
+                        <ul>
+                            <li v-for="people in item.people">
+                                {{people.name}} can't eat there
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>
