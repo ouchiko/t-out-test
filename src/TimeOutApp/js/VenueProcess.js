@@ -2,12 +2,22 @@ import Results from './Results';
 
 class VenueProcess
 {
+    /**
+     * Defines our venues and people
+     *
+     * @param <json> Venues
+     * @param <json> People
+     */
     constructor(Venues, People)
     {
         this._venues = Venues;
         this._people = People;
     }
 
+    /**
+     * Filter the data into those venue we can and cannot goto
+     *
+     */
     doFiltering()
     {
         // Result Object.

@@ -2,18 +2,14 @@ import Venues from './data/venues.json';
 import People from './data/people.json';
 import VenueProcess from './VenueProcess';
 
-// Because why not!
-window.$ = require("jquery");
 window.Vue = require("Vue");
 
-
 document.addEventListener("DOMContentLoaded",function(){
+    // Process the venues and people together.
     let venueProcess = new VenueProcess(Venues, People);
     let [cango, avoid] = venueProcess.doFiltering();
 
-    console.dir(cango);
-    console.dir(avoid);
-
+    // Define our data sets and process via Vue.
     new Vue({
       el: '#app',
       data: {
@@ -22,6 +18,4 @@ document.addEventListener("DOMContentLoaded",function(){
         avoid: avoid
       }
     });
-
-
 });
