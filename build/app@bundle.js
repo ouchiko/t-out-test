@@ -205,12 +205,14 @@ var VenueProcess = function () {
             var _this = this;
 
             // Result Object.
+            var notPossible = [];
             var results = new _Results2.default();
 
             // Process Venues.
             for (var i = 0; i < this._venues.length; i++) {
                 var venue = this._venues[i];
                 var venuestatus = true;
+                var tmpvenues = [];
 
                 venue.drinks = this.caseFix(venue.drinks);
                 venue.food = this.caseFix(venue.food);
@@ -226,6 +228,7 @@ var VenueProcess = function () {
                     person.wont_eat = _this.caseFix(person.wont_eat);
 
                     // More food at the venue than they wont eat, sorted
+                    //if (!notPossible[venue.name]) {
                     if (venue.food.length > person.wont_eat.length || venue.food.length == 0) {
                         caneat = true;
                     } else if (venue.food) {
@@ -236,19 +239,21 @@ var VenueProcess = function () {
                             }
                         }
                     }
+                    //}
 
-                    /* If some venue drinks are in person drinks, well ok */
-                    candrink = venue.drinks.some(function (v) {
-                        return person.drinks.includes(v);
-                    });
+                    // Dont bothe rchecking if we can't eat there.
+                    if (caneat) {
+                        candrink = venue.drinks.some(function (v) {
+                            return person.drinks.includes(v);
+                        });
+                    }
 
                     /* Avoid or not? */
                     if (!caneat || !candrink) {
                         venuestatus = false;
+                        notPossible[venue.name] = 1;
                         results.addAvoidVenue({
                             name: person.name,
-                            class: 'food',
-                            reason: person.wont_eat,
                             restaurant: venue.name
                         });
                     }
